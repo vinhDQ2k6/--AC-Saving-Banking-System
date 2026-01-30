@@ -70,7 +70,8 @@ graph TD
 | :--- | :--- | :--- |
 | **Mục đích** | Tài sản gửi và trả lãi (Stablecoin). | Chứng chỉ sở hữu khoản tiết kiệm. |
 | **Tương tác** | User nạp/rút thông qua SavingBank. | Chỉ SavingBank có quyền Mint/Burn. |
-| **Khả năng chuyển nhượng** | Tự do theo chuẩn ERC20. | Có thể chuyển nhượng (Transferable). |
+| **Khả năng chuyển nhượng** | Tự do theo chuẩn ERC20. | **Transferable - người sở hữu NFT có quyền rút tiền**. |
+| **Quyền rút tiền** | N/A | **NFT owner (không phải depositor gốc)** |
 | **Đơn vị** | 6 Decimals (chuẩn USDC). | Unique Token ID (DepositId). |
 
 ---
@@ -137,7 +138,17 @@ $$Interest = \lfloor\frac{Principal \times APR_{Bps} \times Tenor_{Seconds}}{SEC
 ### 5.2 Yêu Cầu Bảo Mật Tối Thiểu
 1.  **Reentrancy Protection:** Sử dụng `nonReentrant` trên tất cả các hàm có tương tác với ngoại vi (Token transfer).
 2.  **Emergency Stop:** Cơ chế `Pausable` để chặn các hành vi nạp tiền/gia hạn khi có biến cố.
-3.  **Validation:** Checklist nghiêm ngặt cho mỗi giao dịch (Plan status, Balance, Ownership).
+3.  **Validation:** Checklist nghiêm ngặt cho mỗi giao dịch (Plan status, Balance, NFT Ownership).
+4.  **🚨 CRITICAL - DEFAULT_ADMIN_ROLE Security:** 
+    - Current: `bytes32(0)` - dễ bị bruteforce 
+    - **Recommendation:** Transfer to multisig wallet ASAP
+    - **Alternative:** Use custom role via `keccak256("ADMIN_ROLE")`
+
+### 5.3 NFT-Based Withdrawal Security
+1.  **NFT Ownership Validation:** Chỉ `depositCertificate.ownerOf()` có quyền withdraw/renew
+2.  **Transfer Security:** NFT transfer → instant withdrawal rights (consider cooldown)
+3.  **Secondary Market:** NFTs có thể được trade, tạo market cho deposits
+4.  **Original Depositor Loss:** Người gửi tiền gốc mất quyền kiểm soát sau khi transfer NFT
 
 ---
 

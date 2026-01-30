@@ -554,7 +554,7 @@ describe("SavingBank Integration Tests", function () {
       expect(deposit.status).to.equal(1n); // Withdrawn (enum: 0=Active, 1=Withdrawn, 2=Renewed)
     });
 
-    it("should allow certificate transfer (deposit remains tied to original user)", async function () {
+    it("should allow certificate transfer and new owner can withdraw", async function () {
       const { savingBank, mockUSDC, depositCertificate, user1, user2 } = 
         await loadFixture(deployIntegrationFixture);
 
@@ -576,28 +576,78 @@ describe("SavingBank Integration Tests", function () {
       // Verify ownership transferred
       expect(await depositCertificate.ownerOf(certificateId)).to.equal(user2.address);
       
-      // User2 cannot withdraw (deposit is tied to original depositor user1)
+      // User2 can now withdraw since they own the certificate
       await advanceTimeByDays(31);
       
-      let user2WithdrawFailed = false;
+      // User1 cannot withdraw (no longer owns certificate)
+      let user1WithdrawFailed = false;
       try {
-        await savingBank.connect(user2).withdrawDeposit(depositId);
+        await savingBank.connect(user1).withdrawDeposit(depositId);
       } catch (error) {
-        user2WithdrawFailed = true;
+        user1WithdrawFailed = true;
       }
-      expect(user2WithdrawFailed).to.be.true;
+      expect(user1WithdrawFailed).to.be.true;
       
-      // User1 can still withdraw (original depositor)
-      const user1BalanceBefore = await mockUSDC.balanceOf(user1.address);
-      await savingBank.connect(user1).withdrawDeposit(depositId);
-      const user1BalanceAfter = await mockUSDC.balanceOf(user1.address);
+      // User2 can withdraw since they own the certificate
+      const user2BalanceBefore = await mockUSDC.balanceOf(user2.address);
+      await savingBank.connect(user2).withdrawDeposit(depositId);
+      const user2BalanceAfter = await mockUSDC.balanceOf(user2.address);
       
-      // User1 received funds
-      expect(user1BalanceAfter > user1BalanceBefore).to.be.true;
+      // User2 received funds
+      expect(user2BalanceAfter > user2BalanceBefore).to.be.true;
       
       // Verify deposit is now withdrawn
       const deposit = await savingBank.getDeposit(depositId);
       expect(deposit.status).to.equal(1n); // Withdrawn
+    });
+
+    it("should enforce 24-hour cooldown after NFT transfer", async function () {
+      const { savingBank, mockUSDC, depositCertificate, user1, user2 } = 
+        await loadFixture(deployIntegrationFixture);
+
+      const depositAmount = 1000n * ONE_USDC;
+      const planId = 1;
+      
+      // User1 creates deposit
+      await mockUSDC.connect(user1).approve(savingBank.target, depositAmount);
+      const tx = await savingBank.connect(user1).createDeposit(planId, depositAmount, 30);
+      const { depositId, certificateId } = await getDepositIdFromTx(tx);
+      
+      // Advance to maturity
+      await advanceTimeByDays(31);
+      
+      // User1 transfers NFT to User2
+      await depositCertificate.connect(user1).transferFrom(
+        user1.address, 
+        user2.address, 
+        certificateId
+      );
+      
+      // Verify NFT is in cooldown
+      expect(await depositCertificate.isInCooldown(certificateId)).to.be.true;
+      
+      // User2 cannot withdraw immediately (24-hour cooldown)
+      let cooldownBlockedWithdrawal = false;
+      try {
+        await savingBank.connect(user2).withdrawDeposit(depositId);
+      } catch (error: any) {
+        expect(error.message).to.include("CertificateInCooldown");
+        cooldownBlockedWithdrawal = true;
+      }
+      expect(cooldownBlockedWithdrawal).to.be.true;
+      
+      // Advance past cooldown (24 hours)
+      await advanceTimeByDays(1);
+      
+      // Verify cooldown expired
+      expect(await depositCertificate.isInCooldown(certificateId)).to.be.false;
+      
+      // Now User2 can withdraw
+      const user2BalanceBefore = await mockUSDC.balanceOf(user2.address);
+      await savingBank.connect(user2).withdrawDeposit(depositId);
+      const user2BalanceAfter = await mockUSDC.balanceOf(user2.address);
+      
+      expect(user2BalanceAfter > user2BalanceBefore).to.be.true;
     });
   });
 });

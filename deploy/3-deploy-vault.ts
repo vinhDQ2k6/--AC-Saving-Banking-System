@@ -2,14 +2,18 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
 import { ethers } from "hardhat";
 
+/**
+ * @title Deploy Vault
+ * @notice Deploys the Vault contract for liquidity management
+ * @dev Step 3 of 5 in deployment sequence
+ */
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     const { deployments, getNamedAccounts } = hre;
     const { deploy, get } = deployments;
-
     const { deployer } = await getNamedAccounts();
 
     console.log("3️⃣ Deploying Vault contract...");
-    console.log("📋 Using deployer:", deployer);
+    console.log("📋 Deployer:", deployer);
 
     // Get previously deployed contracts
     const mockUSDC = await get("MockUSDC");
@@ -34,9 +38,6 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     await tx.wait();
 
     console.log("✅ Vault deployment completed!");
-    console.log(`📊 Vault Address: ${vaultDeployment.address}`);
-    console.log(`🪙 Token Address: ${mockUSDC.address}`);
-    console.log(`👤 Deployer: ${deployer}`);
     
     return true;
 };

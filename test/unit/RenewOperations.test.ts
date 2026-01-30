@@ -235,7 +235,7 @@ describe("RenewOperations", function () {
   });
 
   describe("Renewal Security and Validation", function () {
-    it("should only allow deposit owner to initiate renewal", async function () {
+    it("should only allow certificate owner to initiate renewal", async function () {
       const depositAmount = 4000_000000n;
       
       // User1 creates deposit
@@ -245,14 +245,26 @@ describe("RenewOperations", function () {
       
       const event = receipt.logs.find((log: any) => log.fragment && log.fragment.name === 'DepositCreated');
       const depositId = event.args[0];
+      const certificateId = event.args[6];
 
-      // Verify deposit ownership
-      const deposit = await savingBank.getDeposit(depositId);
-      expect(deposit.user).to.equal(user1.address);
+      // Transfer certificate to user2
+      await depositCertificate.connect(user1).transferFrom(user1.address, user2.address, certificateId);
       
-      // Test infrastructure ready for ownership validation in renewal
-      // Future renewal function should check:
-      // require(deposit.user == msg.sender, "UnauthorizedRenewal");
+      // Advance to maturity
+      const deposit = await savingBank.getDeposit(depositId);
+      await time.increaseTo(deposit.maturityDate);
+      
+      // User1 (original depositor) cannot renew since they don't own the certificate
+      try {
+        await savingBank.connect(user1).renewDeposit(depositId, 1, 60);
+        expect.fail("Expected function to revert");
+      } catch (error: any) {
+        expect(error.message).to.include('UnauthorizedWithdrawal');
+      }
+      
+      // User2 (certificate owner) can renew
+      const newDepositId = await savingBank.connect(user2).renewDeposit.staticCall(depositId, 1, 60);
+      expect(Number(newDepositId)).to.be.gt(0);
     });
 
     it("should validate new terms meet plan requirements", async function () {

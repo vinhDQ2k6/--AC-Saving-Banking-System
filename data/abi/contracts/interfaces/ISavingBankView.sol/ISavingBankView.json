@@ -3,6 +3,25 @@
         "inputs": [
             {
                 "internalType": "uint256",
+                "name": "depositId",
+                "type": "uint256"
+            }
+        ],
+        "name": "calculateEarlyWithdrawalPenalty",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "penaltyAmount",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
                 "name": "amount",
                 "type": "uint256"
             },
@@ -21,7 +40,7 @@
         "outputs": [
             {
                 "internalType": "uint256",
-                "name": "",
+                "name": "interest",
                 "type": "uint256"
             }
         ],
@@ -34,7 +53,7 @@
         "outputs": [
             {
                 "internalType": "uint256",
-                "name": "",
+                "name": "count",
                 "type": "uint256"
             }
         ],
@@ -100,8 +119,53 @@
                     }
                 ],
                 "internalType": "struct ISavingBankStructs.Deposit",
-                "name": "",
+                "name": "deposit",
                 "type": "tuple"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "getDepositCertificateAddress",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "certificateAddress",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "getDepositToken",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "tokenAddress",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "planId",
+                "type": "uint256"
+            }
+        ],
+        "name": "getPenaltyReceiver",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "receiver",
+                "type": "address"
             }
         ],
         "stateMutability": "view",
@@ -166,8 +230,34 @@
                     }
                 ],
                 "internalType": "struct ISavingBankStructs.SavingPlan",
-                "name": "",
+                "name": "plan",
                 "type": "tuple"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "getTotalDeposits",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "count",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "getTotalPlans",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "count",
+                "type": "uint256"
             }
         ],
         "stateMutability": "view",
@@ -185,8 +275,53 @@
         "outputs": [
             {
                 "internalType": "uint256[]",
-                "name": "",
+                "name": "depositIds",
                 "type": "uint256[]"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "getVaultAddress",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "vaultAddress",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "getVaultBalance",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "balance",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "depositId",
+                "type": "uint256"
+            }
+        ],
+        "name": "isDepositMature",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "isMature",
+                "type": "bool"
             }
         ],
         "stateMutability": "view",

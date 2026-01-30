@@ -26,8 +26,14 @@ contract DepositCertificate is ERC721, ERC721Enumerable, AccessControl, IDeposit
     /// @notice Role identifier for minting and burning certificates
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
+    /// @notice Transfer cooldown period (24 hours) - prevents instant transfer→withdrawal attacks
+    uint256 public constant TRANSFER_COOLDOWN = 24 hours;
+
     /// @dev Mapping to track which deposit IDs have certificates
     mapping(uint256 => bool) private _depositExists;
+    
+    /// @dev Mapping to track last transfer timestamp for each token
+    mapping(uint256 => uint256) private _lastTransferTime;
     
     /// @dev Base URI for token metadata
     string private _baseTokenURI;
@@ -110,14 +116,64 @@ contract DepositCertificate is ERC721, ERC721Enumerable, AccessControl, IDeposit
 
     /**
      * @dev Override required for ERC721Enumerable compatibility
+     * Also tracks transfer timestamps for cooldown mechanism
      */
     function _update(address to, uint256 tokenId, address auth)
         internal
         override(ERC721, ERC721Enumerable)
         returns (address)
     {
-        return super._update(to, tokenId, auth);
+        address from = super._update(to, tokenId, auth);
+        
+        // Track transfer time (skip for mint/burn operations)
+        if (from != address(0) && to != address(0)) {
+            _lastTransferTime[tokenId] = block.timestamp;
+            emit CertificateTransferred(tokenId, from, to, block.timestamp);
+        }
+        
+        return from;
     }
+
+    /**
+     * @notice Get the last transfer timestamp for a token
+     * @param tokenId The token ID to check
+     * @return The timestamp of the last transfer (0 if never transferred)
+     */
+    function getLastTransferTime(uint256 tokenId) external view returns (uint256) {
+        return _lastTransferTime[tokenId];
+    }
+
+    /**
+     * @notice Check if a token is in transfer cooldown period
+     * @param tokenId The token ID to check
+     * @return True if still in cooldown, false if cooldown expired or never transferred
+     */
+    function isInCooldown(uint256 tokenId) external view returns (bool) {
+        uint256 lastTransfer = _lastTransferTime[tokenId];
+        if (lastTransfer == 0) return false;
+        return block.timestamp < lastTransfer + TRANSFER_COOLDOWN;
+    }
+
+    /**
+     * @notice Get remaining cooldown time for a token
+     * @param tokenId The token ID to check
+     * @return Remaining seconds in cooldown (0 if not in cooldown)
+     */
+    function getRemainingCooldown(uint256 tokenId) external view returns (uint256) {
+        uint256 lastTransfer = _lastTransferTime[tokenId];
+        if (lastTransfer == 0) return 0;
+        uint256 cooldownEnd = lastTransfer + TRANSFER_COOLDOWN;
+        if (block.timestamp >= cooldownEnd) return 0;
+        return cooldownEnd - block.timestamp;
+    }
+
+    /// @notice Emitted when a certificate is transferred between addresses
+    event CertificateTransferred(
+        uint256 indexed tokenId,
+        address indexed from,
+        address indexed to,
+        uint256 timestamp
+    );
 
     /**
      * @dev Override required for ERC721Enumerable compatibility

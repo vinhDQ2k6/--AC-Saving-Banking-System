@@ -16,30 +16,31 @@ A comprehensive DeFi saving banking platform implementing Clean Code principles,
 - ✅ **Modular Architecture**: Clean separation between business logic and vault operations
 - ✅ **Role-Based Access Control**: Granular permissions for different operations
 - ✅ **Interest Calculation**: Flexible interest rates with penalty system
-- ✅ **NFT Certificates**: Each deposit represented by a unique NFT
+- ✅ **NFT Certificates**: Each deposit represented by a unique NFT (transferable withdrawal rights)
+- ✅ **NFT-Based Withdrawal**: Certificate holders can withdraw/renew deposits (not original depositors)
 - ✅ **Clean Code Compliance**: SOLID principles, no abbreviations, guard clauses
-- ✅ **Comprehensive Testing**: Complete test coverage with 76/76 tests passing
+- ✅ **Comprehensive Testing**: Complete test coverage with 91/91 tests passing
 
 ## 📊 **Project Status**
 
 **Current Status**: 🎉 **CORE IMPLEMENTATION COMPLETE (Production Ready)**
-- **Smart Contracts**: ✅ 100% Complete (90/90 tests passing)
+- **Smart Contracts**: ✅ 100% Complete (91/91 tests passing)
 - **NatSpec Documentation**: ✅ All contracts fully documented
 - **Business Logic**: ✅ All core functions implemented and validated
 - **Renewal Operations**: ✅ Compound interest system with rollover functionality  
 - **Admin Functions**: ✅ Complete plan management and penalty routing
-- **Security**: ✅ Role-based access control, ownership validation
+- **Security**: ✅ Role-based access control, NFT ownership validation
 - **Ready for**: Testnet deployment and frontend integration
 
 ### **Production Status**
 ```bash
 ✅ Smart Contract Implementation : 100% Complete
 ✅ NatSpec Documentation         : All 4 contracts fully documented
-✅ Core Business Logic           : renewDeposit, admin functions implemented  
-✅ Testing Coverage              : 90/90 tests passing (76 unit + 14 integration)
-✅ Etherscan Verification        : Configured and documented
-✅ Security Validation           : Access control, ownership verified
-✅ Deployment Ready              : Local Hardhat deployment successful
+✅ Core Business Logic           : Deposit, Withdraw, Renew operations
+✅ Testing Coverage              : 91/91 tests passing (76 unit + 15 integration)
+✅ Security Features             : 24h NFT transfer cooldown, role-based access
+✅ Deployment Scripts            : 5-stage deployment sequence ready
+✅ Security Validation           : NFT ownership validation, reentrancy protection
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🎉 STATUS: PRODUCTION READY FOR TESTNET DEPLOYMENT
 ```
@@ -59,16 +60,22 @@ All core business logic is implemented and fully tested.
 
 ```
 contracts/
-├── interfaces/                 # Contract interfaces
-├── libraries/                  # Pure calculation functions
-├── tokens/                     # Test tokens
-├── certificates/               # ERC721 deposit certificates
-├── vault/                      # Liquidity management
-└── SavingBank.sol             # Main business logic
+├── interfaces/                 # Contract interfaces (7 files)
+├── libraries/                  # InterestCalculator library
+├── tokens/                     # MockUSDC test token
+├── certificates/               # DepositCertificate NFT (24h cooldown)
+├── vault/                      # Vault liquidity management
+└── SavingBank.sol              # Main business logic
 
-deploy/                        # Hardhat deployment scripts
-test/                          # Comprehensive test suite  
-documents/                     # Project documentation
+deploy/                          # 5-stage deployment sequence
+├── 1-deploy-mock-usdc.ts       # Deploy USDC token
+├── 2-deploy-deposit-certificate.ts
+├── 3-deploy-vault.ts           # Deploy Vault
+├── 4-deploy-saving-bank.ts     # Deploy SavingBank + setup roles
+└── 5-setup-admin-security.ts   # Transfer admin to multisig
+
+test/                            # 91 tests (76 unit + 15 integration)
+documents/                       # Project documentation
 ```
 
 ## 🚀 Quick Start
@@ -137,13 +144,22 @@ npx hardhat verify --network sepolia <SAVINGBANK_ADDRESS> <MOCK_USDC_ADDRESS> <C
 - **Withdrawals**: Normal maturity + early withdrawal with penalties
 - **Renewals**: Automatic rollover with compounding interest
 
+### Security Features
+- **NFT-Based Ownership**: Only certificate holder can withdraw/renew
+- **24-Hour Transfer Cooldown**: Prevents instant transfer→withdrawal attacks
+- **Role-Based Access Control**: Granular permissions with OpenZeppelin
+- **Reentrancy Protection**: All state-changing functions protected
+- **Pausable Operations**: Emergency pause functionality
+- **Multisig Ready**: Admin transfer script for production
+
 ### Architecture
-- **Vault Separation**: Clean separation of business logic and liquidity management
-- **Role-Based Security**: Granular permissions with OpenZeppelin AccessControl
-- **Clean Code**: SOLID principles, comprehensive testing
+- **Vault Separation**: Clean separation of business logic and liquidity
+- **Modular Design**: SOLID principles, clean code standards
+- **Comprehensive Testing**: 91 tests covering all scenarios
 
 ## 📚 Documentation
 
+- **[SECURITY_ANALYSIS.md](documents/SECURITY_ANALYSIS.md)**: Security features & deployment checklist
 - **[NEXT_PHASE_PLAN.md](documents/NEXT_PHASE_PLAN.md)**: Production deployment roadmap
 - **[QUEST.md](documents/QUEST.md)**: Business requirements
 - **[REQUIREMENT.md](documents/REQUIREMENT.md)**: Technical standards

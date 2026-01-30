@@ -32,6 +32,22 @@
         "type": "error"
     },
     {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "depositId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "remainingSeconds",
+                "type": "uint256"
+            }
+        ],
+        "name": "CertificateInCooldown",
+        "type": "error"
+    },
+    {
         "inputs": [],
         "name": "ContractPaused",
         "type": "error"

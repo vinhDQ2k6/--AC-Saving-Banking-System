@@ -4,95 +4,101 @@ Tài liệu này chứa **toàn bộ signatures, errors, events và file mapping
 
 ---
 
-## 🚀 TRẠNG THÁI TRIỂN KHAI HIỆN TẠI
+## 🚀 TRẠNG THÁI TRIỂN KHAI (Cập nhật 31/01/2026)
 
-### ✅ **HOÀN THÀNH - Production Ready (100% Test Coverage)**
+### ✅ **PRODUCTION READY - SEPOLIA DEPLOYED + MULTISIG SECURED**
+
 - [x] **Vault Contract**: Đã triển khai đầy đủ với role-based access control
-- [x] **SavingBank Contract**: Đã cập nhật sử dụng dependency injection pattern  
+- [x] **SavingBank Contract**: Đã cập nhật sử dụng dependency injection pattern
 - [x] **Interface Segregation**: Interfaces rõ ràng cho tất cả contract interactions
-- [x] **Deploy Scripts**: Hoàn thành 4 giai đoạn deployment với role setup
+- [x] **Deploy Scripts**: Hoàn thành 5 giai đoạn deployment
 - [x] **Contract Compilation**: Tất cả contracts compile thành công
 - [x] **Local Deployment**: Deploy thành công lên Hardhat network
-- [x] **Comprehensive Testing**: **76/76 tests passing (100% success rate)**
-- [x] **🔍 Audit Completed**: Kiểm tra toàn diện ngày 29/01/2026 - TẤT CẢ ĐẠT
+- [x] **Comprehensive Testing**: **155/155 tests passing (100% success rate)**
+- [x] **🔍 Audit Completed**: Internal audit passed 30/01/2026
+- [x] **NFT-Based Withdrawal**: Certificate holder system implemented
+- [x] **24h Transfer Cooldown**: Anti-instant-withdrawal security
+- [x] **Sepolia Deployment**: 4 contracts deployed và verified
+- [x] **Multisig Security**: Gnosis Safe với 3 signers
+- [x] **Admin Transfer**: Deployer revoked, multisig có full admin
+- [x] **View Functions Enhanced**: Thêm các view functions mới (31/01/2026)
 
-**Test Infrastructure Status (Đã cập nhật 29/01/2026):**
+**Test Infrastructure Status:**
+
 ```bash
-✅ Foundation Layer    : 18/18 tests (100%)
-✅ Core Business Logic : 12/12 tests (100%)  
-✅ Deposit Operations  : 12/12 tests (100%)
-✅ Withdraw Operations : 13/13 tests (100%)
-✅ Renew Operations    : 10/10 tests (100%)
-✅ Vault Operations    : 12/12 tests (100%)
+✅ Business Tests (6 files) : 60+ tests (100%)
+✅ Unit Tests (7 files)     : 70+ tests (100%)
+✅ Integration Tests        : 16 tests (100%)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📊 TOTAL              : 76/76 tests (100%)
+📊 TOTAL                    : 155 tests (100%)
 ```
 
-**Audit Report:** Xem chi tiết tại [AUDIT_REPORT.md](./AUDIT_REPORT.md)
+**Sepolia Deployment (LIVE):**
+| Contract | Address | Status |
+|----------|---------|--------|
+| MockUSDC | `0x4806158ad022d93a27bB17eF6d423870BA23fac7` | ✅ Verified |
+| DepositCertificate | `0xDc112945182d21d10DEfEb1E179F96F5075BB6BF` | ✅ Verified |
+| Vault | `0xA78f3F0D5de4C4B7789216Ee5e56f4BE0542e128` | ✅ Verified |
+| SavingBank | `0x2fcF8E2110dc3b1111DF0F222B4F572d06A9548f` | ✅ Verified |
 
-**Production Ready Deployment (Local Hardhat Network):**
-- MockUSDC: `0x5FbDB2315678afecb367f032d93F642f64180aa3`
-- DepositCertificate: `0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512`  
-- Vault: `0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0`
-- SavingBank: `0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9`
+**Multisig Admin:**
+| | Value |
+|---|-------|
+| Gnosis Safe | `0x09E6F2590fF9245245735c59dFE1AE862AB1A082` |
+| Dashboard | [Gnosis Safe UI](https://app.safe.global/home?safe=sep:0x09E6F2590fF9245245735c59dFE1AE862AB1A082) |
 
-### 🚀 **SẴN SÀNG CHO PRODUCTION**
-- [x] **Core Business Logic**: Tất cả functions hoàn chỉnh và validated
-- [x] **Security Standards**: Role-based access control, ownership validation
-- [x] **Event Emissions**: Complete event system cho frontend integration
-- [x] **Audit Passed**: Xem [AUDIT_REPORT.md](./AUDIT_REPORT.md)
-- [ ] **Testnet Deployment**: Ready cho Sepolia/Goerli deployment
-- [ ] **Frontend Integration**: Sẵn sàng cho Web3 interface development
-- [ ] **Contract Verification**: Setup Etherscan verification
+### 🔜 **NEXT PHASE: FRONTEND + EXTERNAL AUDIT**
+
+- [ ] External security audit
+- [ ] Frontend development
+- [ ] Mainnet deployment
 
 ---
 
-## 1. CẤU TRÚC THƯ MỤC HOÀN CHỈNH (ĐÃ CẬP NHẬT)
+## 1. CẤU TRÚC THƯ MỤC HOÀN CHỈNH
 
 ```
 contracts/
 ├── interfaces/
-│   ├── ISavingBankStructs.sol    # ✅ Structs: SavingPlan, Deposit, DepositRecord  
-│   ├── ISavingBankErrors.sol     # ✅ Tất cả custom errors đã cập nhật
-│   ├── ISavingBankEvents.sol     # ✅ Tất cả events đã cập nhật
+│   ├── ISavingBankStructs.sol    # ✅ Structs: SavingPlan, Deposit, DepositStatus
+│   ├── ISavingBankErrors.sol     # ✅ Tất cả custom errors
+│   ├── ISavingBankEvents.sol     # ✅ Tất cả events
+│   ├── ISavingBankAdmin.sol      # ✅ Admin interface
+│   ├── ISavingBankUser.sol       # ✅ User interface
+│   ├── ISavingBankView.sol       # ✅ View interface (enhanced)
 │   ├── IDepositCertificate.sol   # ✅ NFT interface hoàn chỉnh
-│   ├── IVault.sol                # ✅ Vault interface với 6 core functions
+│   ├── IVault.sol                # ✅ Vault interface với core functions
 │   └── IVaultEvents.sol          # ✅ Vault events cho liquidity operations
 │
 ├── libraries/
 │   └── InterestCalculator.sol    # ✅ Pure math functions hoàn chỉnh
 │
 ├── certificates/
-│   └── DepositCertificate.sol    # ✅ ERC721 với enumerable extension
+│   └── DepositCertificate.sol    # ✅ ERC721 với enumerable + cooldown
 │
 ├── tokens/
-│   └── MockUSDC.sol              # ✅ ERC20 mock với 6 decimals, minting capability
+│   └── MockUSDC.sol              # ✅ ERC20 mock với 6 decimals
 │
 ├── vault/
-│   └── Vault.sol                 # ✅ Liquidity management contract với AccessControl
+│   └── Vault.sol                 # ✅ Liquidity management với AccessControl
 │
-└── SavingBank.sol                # ✅ Main business logic với vault separation
+└── SavingBank.sol                # ✅ Main business logic
 
-deploy/                           # ✅ Hoàn chỉnh 4-stage deployment
-├── 1-deploy-mock-usdc.ts        # ✅ Deploy MockUSDC với initial supply
-├── 2-deploy-deposit-certificate.ts # ✅ Deploy NFT với constructor args
-├── 3-deploy-vault.ts            # ✅ Deploy Vault với role setup  
-└── 99-deploy-saving-bank.ts     # ✅ Deploy SavingBank với dependency injection
+deploy/                           # ✅ Hoàn chỉnh 5-stage deployment
+├── 1-deploy-mock-usdc.ts
+├── 2-deploy-deposit-certificate.ts
+├── 3-deploy-vault.ts
+├── 4-deploy-saving-bank.ts
+└── 5-setup-admin-security.ts
 
-test/                            # 🏗️ Test structure ready, implementations pending
+test/
 ├── helpers/
-│   ├── constants.ts              # [ ] Constants cần implement
-│   ├── fixtures.ts               # [ ] Deploy fixtures cần implement  
-│   └── time.ts                   # [ ] Time helpers cần implement
-├── unit/                        # 📁 Test files skeleton ready
-│   ├── InterestCalculator.test.ts
-│   ├── SavingPlan.test.ts
-│   ├── DepositOperations.test.ts
-│   ├── WithdrawOperations.test.ts
-│   ├── RenewOperations.test.ts
-│   └── VaultOperations.test.ts
-└── integration/
-    └── SavingBank.integration.test.ts
+│   ├── constants.ts              # ✅ Constants
+│   ├── fixtures.ts               # ✅ Deploy fixtures
+│   └── time.ts                   # ✅ Time helpers
+├── business/                     # ✅ Business scenario tests
+├── unit/                         # ✅ Unit tests
+└── integration/                  # ✅ Integration tests
 ```
 
 ---
@@ -101,8 +107,8 @@ test/                            # 🏗️ Test structure ready, implementations
 
 ```solidity
 // InterestCalculator.sol
-uint256 public constant BASIS_POINTS = 10_000;
-uint256 public constant SECONDS_PER_YEAR = 365 days; // 31_536_000
+uint256 public constant BASIS_POINTS = 10_000;      // 1% = 100 bp
+uint256 public constant DAYS_PER_YEAR = 365;
 
 // SavingBank.sol - Roles
 bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
@@ -110,7 +116,11 @@ bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
 
 // DepositCertificate.sol - Roles
 bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
-bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE");
+uint256 public constant TRANSFER_COOLDOWN = 24 hours;
+
+// Vault.sol - Roles
+bytes32 public constant LIQUIDITY_MANAGER_ROLE = keccak256("LIQUIDITY_MANAGER_ROLE");
+bytes32 public constant WITHDRAW_ROLE = keccak256("WITHDRAW_ROLE");
 ```
 
 ---
@@ -122,34 +132,44 @@ bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE");
 pragma solidity ^0.8.28;
 
 interface ISavingBankStructs {
+    enum DepositStatus {
+        Active,
+        Withdrawn,
+        Renewed
+    }
+
     struct SavingPlan {
-        uint256 planId;
-        uint64 tenorSeconds;
-        uint32 annualInterestRateBps;
-        uint256 minimumDeposit;
-        uint256 maximumDeposit;
-        uint32 earlyWithdrawalPenaltyBps;
-        address penaltyReceiver;
-        bool isEnabled;
+        uint256 id;
+        string name;
+        uint256 minDepositAmount;           // Số tiền gửi tối thiểu
+        uint256 maxDepositAmount;           // Số tiền gửi tối đa (0 = không giới hạn)
+        uint32 minTermInDays;               // Kỳ hạn tối thiểu (ngày)
+        uint32 maxTermInDays;               // Kỳ hạn tối đa (ngày)
+        uint256 annualInterestRateInBasisPoints;  // Lãi suất năm (800 = 8%)
+        uint256 penaltyRateInBasisPoints;         // Tỷ lệ phạt rút sớm
+        bool isActive;                      // Trạng thái hoạt động
     }
 
     struct SavingPlanInput {
-        uint64 tenorSeconds;
-        uint32 annualInterestRateBps;
-        uint256 minimumDeposit;
-        uint256 maximumDeposit;
-        uint32 earlyWithdrawalPenaltyBps;
-        address penaltyReceiver;
+        string name;
+        uint256 minDepositAmount;
+        uint256 maxDepositAmount;
+        uint32 minTermInDays;
+        uint32 maxTermInDays;
+        uint256 annualInterestRateInBasisPoints;
+        uint256 penaltyRateInBasisPoints;
     }
 
-    struct DepositRecord {
-        uint256 depositId;
-        address depositor;
-        uint256 planId;
-        uint256 principalAmount;
-        uint64 depositTimestamp;
-        uint64 maturityTimestamp;
-        bool isClosed;
+    struct Deposit {
+        uint256 id;
+        address user;                       // Người gửi ban đầu
+        uint256 savingPlanId;
+        uint256 amount;                     // Số tiền gốc
+        uint32 termInDays;                  // Kỳ hạn (ngày)
+        uint256 expectedInterest;           // Lãi dự kiến khi đáo hạn
+        uint256 depositDate;                // Thời điểm gửi
+        uint256 maturityDate;               // Thời điểm đáo hạn
+        DepositStatus status;               // Trạng thái
     }
 }
 ```
@@ -163,33 +183,32 @@ interface ISavingBankStructs {
 pragma solidity ^0.8.28;
 
 interface ISavingBankErrors {
-    // Plan errors
-    error PlanNotFound(uint256 planId);
-    error PlanNotEnabled(uint256 planId);
-    error InvalidTenorSeconds(uint64 tenorSeconds);
-    error InvalidInterestRate(uint32 annualInterestRateBps);
-    error InvalidPenaltyRate(uint32 penaltyBps);
+    // Plan related errors
+    error SavingPlanNotFound(uint256 planId);
+    error SavingPlanNotActive(uint256 planId);
+    error InvalidTermDays(uint32 termInDays);
+    error InvalidInterestRate(uint256 annualInterestRateInBasisPoints);
+    error InvalidPenaltyRate(uint256 penaltyRateInBasisPoints);
 
-    // Deposit errors
+    // Deposit related errors
     error DepositNotFound(uint256 depositId);
+    error DepositNotActive(uint256 depositId);
     error DepositAlreadyClosed(uint256 depositId);
-    error DepositNotMature(uint256 depositId, uint64 maturityTimestamp, uint64 currentTimestamp);
+    error DepositNotMature(uint256 depositId, uint256 maturityTimestamp, uint256 currentTimestamp);
     error DepositStillActive(uint256 depositId);
 
-    // Amount errors
-    error ZeroAmount();
-    error AmountBelowMinimum(uint256 amount, uint256 minimumRequired);
-    error AmountAboveMaximum(uint256 amount, uint256 maximumAllowed);
+    // Amount related errors
+    error InvalidAmount(uint256 amount);
+    error InsufficientDepositAmount(uint256 amount, uint256 minimumRequired);
+    error ExcessiveDepositAmount(uint256 amount, uint256 maximumAllowed);
 
-    // Vault errors
+    // Access and permission errors
+    error UnauthorizedWithdrawal(address caller, uint256 depositId);
+    error InvalidAddress();
     error InsufficientVaultLiquidity(uint256 requested, uint256 available);
 
-    // Access errors
-    error UnauthorizedCaller(address caller, address expectedOwner);
-    error ZeroAddress();
-
-    // State errors
-    error ContractPaused();
+    // NFT transfer cooldown error
+    error CertificateInCooldown(uint256 depositId, uint256 remainingSeconds);
 }
 ```
 
@@ -202,48 +221,29 @@ interface ISavingBankErrors {
 pragma solidity ^0.8.28;
 
 interface ISavingBankEvents {
-    // ═══════════════════════════════════════════════════════════════
-    // PLAN EVENTS
-    // ═══════════════════════════════════════════════════════════════
-    
-    event SavingPlanCreated(
-        uint256 indexed planId,
-        uint64 tenorSeconds,
-        uint32 annualInterestRateBps,
-        uint256 minimumDeposit,
-        uint256 maximumDeposit,
-        uint32 earlyWithdrawalPenaltyBps,
-        address indexed penaltyReceiver
-    );
+    // Saving Plan events
+    event SavingPlanCreated(uint256 indexed planId, string name);
+    event SavingPlanUpdated(uint256 indexed planId);
+    event SavingPlanActivated(uint256 indexed planId);
+    event SavingPlanDeactivated(uint256 indexed planId);
+    event SavingPlanStatusUpdated(uint256 indexed planId, bool isEnabled);
+    event PenaltyReceiverUpdated(uint256 indexed planId, address indexed oldReceiver, address indexed newReceiver);
 
-    event SavingPlanStatusUpdated(
-        uint256 indexed planId,
-        bool isEnabled
-    );
-
-    event PenaltyReceiverUpdated(
-        uint256 indexed planId,
-        address indexed oldReceiver,
-        address indexed newReceiver
-    );
-
-    // ═══════════════════════════════════════════════════════════════
-    // DEPOSIT EVENTS
-    // ═══════════════════════════════════════════════════════════════
-
-    event DepositOpened(
+    // Deposit events
+    event DepositCreated(
         uint256 indexed depositId,
-        address indexed depositor,
-        uint256 indexed planId,
-        uint256 principalAmount,
-        uint64 depositTimestamp,
-        uint64 maturityTimestamp
+        address indexed user,
+        uint256 indexed savingPlanId,
+        uint256 amount,
+        uint32 termInDays,
+        uint256 maturityDate,
+        uint256 certificateId
     );
 
     event DepositWithdrawn(
         uint256 indexed depositId,
-        address indexed recipient,
-        uint256 principalAmount,
+        address indexed user,
+        uint256 withdrawAmount,
         uint256 interestAmount,
         uint256 penaltyAmount,
         bool isEarlyWithdrawal
@@ -257,21 +257,9 @@ interface ISavingBankEvents {
         uint256 newPlanId
     );
 
-    // ═══════════════════════════════════════════════════════════════
-    // VAULT EVENTS
-    // ═══════════════════════════════════════════════════════════════
-
-    event VaultDeposited(
-        address indexed admin,
-        uint256 amount,
-        uint256 newVaultBalance
-    );
-
-    event VaultWithdrawn(
-        address indexed admin,
-        uint256 amount,
-        uint256 newVaultBalance
-    );
+    // Liquidity management events
+    event LiquidityDeposited(address indexed admin, uint256 amount);
+    event LiquidityWithdrawn(address indexed admin, uint256 amount);
 }
 ```
 
@@ -282,36 +270,32 @@ interface ISavingBankEvents {
 ### 6.1 Admin Functions (ISavingBankAdmin.sol)
 
 ```solidity
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.28;
-
-import "./ISavingBankStructs.sol";
-
 interface ISavingBankAdmin is ISavingBankStructs {
     /// @notice Tạo gói tiết kiệm mới
-    /// @param input Thông tin cấu hình gói tiết kiệm
-    /// @return planId ID của gói tiết kiệm mới được tạo
-    function createSavingPlan(SavingPlanInput calldata input) external returns (uint256 planId);
+    function createSavingPlan(SavingPlanInput calldata input) external;
 
-    /// @notice Cập nhật trạng thái hoạt động của gói tiết kiệm
-    /// @param planId ID của gói cần cập nhật
-    /// @param isEnabled Trạng thái mới (true = hoạt động, false = tạm dừng)
+    /// @notice Cập nhật gói tiết kiệm
+    function updateSavingPlan(uint256 planId, SavingPlanInput calldata input) external;
+
+    /// @notice Cập nhật trạng thái hoạt động của gói
     function updateSavingPlanStatus(uint256 planId, bool isEnabled) external;
 
     /// @notice Cập nhật địa chỉ nhận tiền phạt
-    /// @param planId ID của gói cần cập nhật
-    /// @param newReceiver Địa chỉ mới nhận tiền phạt
     function updatePenaltyReceiver(uint256 planId, address newReceiver) external;
 
-    /// @notice Nạp token vào vault để trả lãi cho người dùng
-    /// @param amount Số lượng token nạp vào
+    /// @notice Kích hoạt gói tiết kiệm
+    function activateSavingPlan(uint256 planId) external;
+
+    /// @notice Vô hiệu hóa gói tiết kiệm
+    function deactivateSavingPlan(uint256 planId) external;
+
+    /// @notice Nạp token vào vault để trả lãi
     function depositToVault(uint256 amount) external;
 
     /// @notice Rút token từ vault
-    /// @param amount Số lượng token rút ra
     function withdrawFromVault(uint256 amount) external;
 
-    /// @notice Tạm dừng hệ thống (chặn openDeposit, renewDeposit)
+    /// @notice Tạm dừng hệ thống
     function pause() external;
 
     /// @notice Mở lại hệ thống
@@ -322,91 +306,104 @@ interface ISavingBankAdmin is ISavingBankStructs {
 ### 6.2 User Functions (ISavingBankUser.sol)
 
 ```solidity
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.28;
-
 interface ISavingBankUser {
-    /// @notice Mở sổ tiết kiệm mới
-    /// @param planId ID của gói tiết kiệm muốn sử dụng
-    /// @param amount Số tiền gửi (phải trong khoảng min-max của plan)
-    /// @return depositId ID của sổ tiết kiệm mới được tạo
-    function openDeposit(uint256 planId, uint256 amount) external returns (uint256 depositId);
+    /// @notice Tạo sổ tiết kiệm mới
+    /// @param savingPlanId ID của gói tiết kiệm
+    /// @param amount Số tiền gửi
+    /// @param termInDays Kỳ hạn gửi (ngày)
+    /// @return depositId ID của sổ tiết kiệm mới
+    function createDeposit(
+        uint256 savingPlanId,
+        uint256 amount,
+        uint32 termInDays
+    ) external returns (uint256 depositId);
 
-    /// @notice Tất toán sổ tiết kiệm (đúng hạn hoặc trước hạn)
-    /// @param depositId ID của sổ tiết kiệm cần tất toán
-    /// @dev Nếu đúng hạn: nhận gốc + lãi. Nếu trước hạn: nhận gốc - phạt
+    /// @notice Rút tiền (đúng hạn hoặc trước hạn)
+    /// @dev Chỉ NFT owner mới có quyền rút
     function withdrawDeposit(uint256 depositId) external;
 
     /// @notice Gia hạn sổ tiết kiệm (chỉ khi đã đáo hạn)
-    /// @param depositId ID của sổ tiết kiệm cũ
-    /// @param newPlanId ID của gói tiết kiệm cho kỳ mới
-    /// @return newDepositId ID của sổ tiết kiệm mới
-    /// @dev Gốc mới = Gốc cũ + Lãi. NFT cũ bị burn, NFT mới được mint
-    function renewDeposit(uint256 depositId, uint256 newPlanId) external returns (uint256 newDepositId);
+    /// @param depositId ID của sổ cũ
+    /// @param newPlanId ID của gói mới
+    /// @param newTermInDays Kỳ hạn mới
+    /// @return newDepositId ID của sổ mới
+    function renewDeposit(
+        uint256 depositId,
+        uint256 newPlanId,
+        uint32 newTermInDays
+    ) external returns (uint256 newDepositId);
 }
 ```
 
 ### 6.3 View Functions (ISavingBankView.sol)
 
 ```solidity
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.28;
-
-import "./ISavingBankStructs.sol";
-
 interface ISavingBankView is ISavingBankStructs {
-    /// @notice Lấy thông tin chi tiết của một gói tiết kiệm
+    /// @notice Lấy thông tin gói tiết kiệm
     function getSavingPlan(uint256 planId) external view returns (SavingPlan memory);
 
-    /// @notice Lấy thông tin chi tiết của một sổ tiết kiệm
-    function getDepositRecord(uint256 depositId) external view returns (DepositRecord memory);
+    /// @notice Lấy thông tin sổ tiết kiệm
+    function getDeposit(uint256 depositId) external view returns (Deposit memory);
 
-    /// @notice Kiểm tra sổ tiết kiệm đã đáo hạn chưa
-    function isDepositMature(uint256 depositId) external view returns (bool);
+    /// @notice Lấy danh sách deposit IDs của user
+    function getUserDepositIds(address user) external view returns (uint256[] memory);
 
-    /// @notice Tính lãi dự kiến khi đáo hạn
-    function calculateExpectedInterest(uint256 depositId) external view returns (uint256);
+    /// @notice Đếm số lượng deposits đang active
+    function getActiveDepositCount() external view returns (uint256);
 
-    /// @notice Tính tiền phạt nếu rút trước hạn
-    function calculateEarlyWithdrawalPenalty(uint256 depositId) external view returns (uint256);
+    /// @notice Tính lãi dự kiến cho deposit giả định
+    function calculateExpectedInterest(uint256 amount, uint256 planId, uint32 termInDays) external view returns (uint256);
 
-    /// @notice Lấy số dư hiện tại của vault thanh khoản
-    function getVaultBalance() external view returns (uint256);
-
-    /// @notice Lấy tổng số gói tiết kiệm đã tạo
+    /// @notice Lấy tổng số gói tiết kiệm
     function getTotalPlans() external view returns (uint256);
 
-    /// @notice Lấy tổng số sổ tiết kiệm đã mở
+    /// @notice Lấy tổng số deposits
     function getTotalDeposits() external view returns (uint256);
 
-    /// @notice Lấy địa chỉ token được sử dụng
+    /// @notice Lấy địa chỉ token gửi
     function getDepositToken() external view returns (address);
 
-    /// @notice Lấy địa chỉ contract NFT chứng chỉ
-    function getDepositCertificate() external view returns (address);
+    /// @notice Lấy địa chỉ NFT certificate
+    function getDepositCertificateAddress() external view returns (address);
+
+    /// @notice Lấy địa chỉ vault
+    function getVaultAddress() external view returns (address);
+
+    /// @notice Lấy số dư vault
+    function getVaultBalance() external view returns (uint256);
+
+    /// @notice Kiểm tra deposit đã đáo hạn chưa
+    function isDepositMature(uint256 depositId) external view returns (bool);
+
+    /// @notice Tính tiền phạt rút sớm cho deposit
+    function calculateEarlyWithdrawalPenalty(uint256 depositId) external view returns (uint256);
+
+    /// @notice Lấy địa chỉ nhận tiền phạt của plan
+    function getPenaltyReceiver(uint256 planId) external view returns (address);
 }
 ```
 
 ### 6.4 NFT Interface (IDepositCertificate.sol)
 
 ```solidity
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.28;
-
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-
 interface IDepositCertificate is IERC721 {
-    /// @notice Mint chứng chỉ tiết kiệm cho người dùng
-    /// @param to Địa chỉ nhận NFT
-    /// @param depositId ID của sổ tiết kiệm (cũng là tokenId)
-    function mintCertificate(address to, uint256 depositId) external;
+    /// @notice Mint chứng chỉ tiết kiệm
+    function mintCertificate(address to, uint256 depositId) external returns (uint256);
 
-    /// @notice Burn chứng chỉ khi tất toán hoặc gia hạn
-    /// @param depositId ID của sổ tiết kiệm cần burn
+    /// @notice Burn chứng chỉ
     function burnCertificate(uint256 depositId) external;
 
-    /// @notice Kiểm tra NFT có tồn tại không
+    /// @notice Kiểm tra certificate tồn tại
     function exists(uint256 depositId) external view returns (bool);
+
+    /// @notice Kiểm tra đang trong cooldown period
+    function isInCooldown(uint256 tokenId) external view returns (bool);
+
+    /// @notice Lấy thời gian cooldown còn lại
+    function getRemainingCooldown(uint256 tokenId) external view returns (uint256);
+
+    /// @notice Lấy thời điểm transfer cuối
+    function getLastTransferTime(uint256 tokenId) external view returns (uint256);
 }
 ```
 
@@ -415,36 +412,31 @@ interface IDepositCertificate is IERC721 {
 ## 7. LIBRARY: InterestCalculator.sol
 
 ```solidity
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.28;
-
 library InterestCalculator {
     uint256 public constant BASIS_POINTS = 10_000;
-    uint256 public constant SECONDS_PER_YEAR = 365 days;
+    uint256 public constant DAYS_PER_YEAR = 365;
 
     /// @notice Tính lãi đơn (simple interest)
-    /// @param principal Số tiền gốc
-    /// @param annualInterestRateBps Lãi suất năm (basis points)
-    /// @param tenorSeconds Thời gian gửi (giây)
-    /// @return interest Tiền lãi (làm tròn xuống)
+    /// Formula: Interest = (Principal × Rate × Days) / (BASIS_POINTS × DAYS_PER_YEAR)
     function calculateSimpleInterest(
         uint256 principal,
-        uint32 annualInterestRateBps,
-        uint64 tenorSeconds
-    ) internal pure returns (uint256 interest) {
-        interest = (principal * annualInterestRateBps * tenorSeconds) / (SECONDS_PER_YEAR * BASIS_POINTS);
-    }
+        uint256 annualRateInBasisPoints,
+        uint256 termInDays
+    ) internal pure returns (uint256 interest);
 
-    /// @notice Tính tiền phạt rút trước hạn
-    /// @param principal Số tiền gốc
-    /// @param penaltyBps Tỷ lệ phạt (basis points)
-    /// @return penalty Tiền phạt (làm tròn xuống)
+    /// @notice Tính tiền phạt rút sớm
+    /// Formula: Penalty = (Principal × PenaltyRate) / BASIS_POINTS
     function calculatePenalty(
         uint256 principal,
-        uint32 penaltyBps
-    ) internal pure returns (uint256 penalty) {
-        penalty = (principal * penaltyBps) / BASIS_POINTS;
-    }
+        uint256 penaltyRateInBasisPoints
+    ) internal pure returns (uint256 penalty);
+
+    /// @notice Tính tổng số tiền nhận khi đáo hạn
+    function calculateMaturityAmount(
+        uint256 principal,
+        uint256 annualRateInBasisPoints,
+        uint256 termInDays
+    ) internal pure returns (uint256 maturityAmount);
 }
 ```
 
@@ -452,319 +444,134 @@ library InterestCalculator {
 
 ## 8. PERMISSION MATRIX
 
-| Function | DEFAULT_ADMIN | ADMIN_ROLE | PAUSER_ROLE | NFT Owner | Anyone |
-|:---------|:-------------:|:----------:|:-----------:|:---------:|:------:|
-| `createSavingPlan` | ✅ | ✅ | ❌ | ❌ | ❌ |
-| `updateSavingPlanStatus` | ✅ | ✅ | ❌ | ❌ | ❌ |
-| `updatePenaltyReceiver` | ✅ | ✅ | ❌ | ❌ | ❌ |
-| `depositToVault` | ✅ | ✅ | ❌ | ❌ | ❌ |
-| `withdrawFromVault` | ✅ | ✅ | ❌ | ❌ | ❌ |
-| `pause` | ✅ | ❌ | ✅ | ❌ | ❌ |
-| `unpause` | ✅ | ❌ | ✅ | ❌ | ❌ |
-| `openDeposit` | ❌ | ❌ | ❌ | ❌ | ✅ |
-| `withdrawDeposit` | ❌ | ❌ | ❌ | ✅ | ❌ |
-| `renewDeposit` | ❌ | ❌ | ❌ | ✅ | ❌ |
-| `getSavingPlan` | ❌ | ❌ | ❌ | ❌ | ✅ |
-| `getDepositRecord` | ❌ | ❌ | ❌ | ❌ | ✅ |
+| Function                 | DEFAULT_ADMIN | ADMIN_ROLE | PAUSER_ROLE | NFT Owner | Anyone |
+| :----------------------- | :-----------: | :--------: | :---------: | :-------: | :----: |
+| `createSavingPlan`       |      ✅       |     ✅     |     ❌      |    ❌     |   ❌   |
+| `updateSavingPlan`       |      ✅       |     ✅     |     ❌      |    ❌     |   ❌   |
+| `updateSavingPlanStatus` |      ✅       |     ✅     |     ❌      |    ❌     |   ❌   |
+| `updatePenaltyReceiver`  |      ✅       |     ✅     |     ❌      |    ❌     |   ❌   |
+| `depositToVault`         |      ✅       |     ✅     |     ❌      |    ❌     |   ❌   |
+| `withdrawFromVault`      |      ✅       |     ✅     |     ❌      |    ❌     |   ❌   |
+| `pause`                  |      ✅       |     ❌     |     ✅      |    ❌     |   ❌   |
+| `unpause`                |      ✅       |     ❌     |     ✅      |    ❌     |   ❌   |
+| `createDeposit`          |      ❌       |     ❌     |     ❌      |    ❌     |   ✅   |
+| `withdrawDeposit`        |      ❌       |     ❌     |     ❌      |    ✅     |   ❌   |
+| `renewDeposit`           |      ❌       |     ❌     |     ❌      |    ✅     |   ❌   |
+| View functions           |      ❌       |     ❌     |     ❌      |    ❌     |   ✅   |
 
 ---
 
-## 9. INTERNAL HELPER FUNCTIONS (SavingBank.sol)
+## 9. CÔNG THỨC NGHIỆP VỤ
 
-```solidity
-// ═══════════════════════════════════════════════════════════════
-// VALIDATION HELPERS
-// ═══════════════════════════════════════════════════════════════
+### 9.1 Tính Lãi Đơn (Simple Interest)
 
-function _validatePlanExists(uint256 planId) internal view;
-function _validatePlanEnabled(uint256 planId) internal view;
-function _validateDepositAmount(uint256 planId, uint256 amount) internal view;
-function _validateDepositExists(uint256 depositId) internal view;
-function _validateDepositOwnership(uint256 depositId, address caller) internal view;
-function _validateDepositNotClosed(uint256 depositId) internal view;
-function _validateDepositMature(uint256 depositId) internal view;
-function _validateVaultLiquidity(uint256 requiredAmount) internal view;
-function _validateNonZeroAmount(uint256 amount) internal pure;
-function _validateNonZeroAddress(address account) internal pure;
+$$Interest = \lfloor\frac{Principal \times APR_{Bps} \times Term_{Days}}{DAYS\_PER\_YEAR \times BASIS\_POINTS}\rfloor$$
 
-// ═══════════════════════════════════════════════════════════════
-// BUSINESS LOGIC HELPERS
-// ═══════════════════════════════════════════════════════════════
+**Ví dụ:** 1000 USDC × 800 bps × 30 days / (365 × 10000) = 6.575 USDC
 
-function _createDepositRecord(uint256 planId, uint256 amount) internal returns (uint256 depositId);
-function _closeDeposit(uint256 depositId) internal;
-function _processMaturityWithdrawal(uint256 depositId) internal;
-function _processEarlyWithdrawal(uint256 depositId) internal;
-function _calculateRenewalPrincipal(uint256 depositId) internal view returns (uint256);
-function _isDepositMature(uint256 depositId) internal view returns (bool);
-function _getDepositOwner(uint256 depositId) internal view returns (address);
-```
+### 9.2 Tính Phạt Rút Sớm
+
+$$Penalty = \lfloor\frac{Principal \times Penalty_{Bps}}{BASIS\_POINTS}\rfloor$$
+
+**Ví dụ:** 1000 USDC × 100 bps / 10000 = 10 USDC
+
+### 9.3 Xử Lý Rút Tiền
+
+- **Đúng hạn:** `Payout = Principal + Interest`
+- **Trước hạn:** `Payout = Principal - Penalty` (không có lãi)
+
+### 9.4 Gia Hạn (Compound Interest)
+
+- **New Principal = Old Principal + Old Interest**
+- NFT cũ burn, NFT mới mint cho kỳ mới
 
 ---
 
-## 10. TEST CASES CHECKLIST
+## 10. SECURITY FEATURES
 
-### 10.1 InterestCalculator.test.ts
-- [ ] Tính lãi với principal = 100 USDC, 8% APR, 30 ngày
-- [ ] Tính lãi với principal = 1,000,000 USDC, 8% APR, 365 ngày
-- [ ] Tính lãi với APR = 0% → interest = 0
-- [ ] Tính lãi với tenor = 0 → interest = 0
-- [ ] Tính penalty với 1% penalty rate
-- [ ] Edge case: principal = 0
+### 10.1 NFT Transfer Cooldown (24 hours)
 
-### 10.2 SavingPlan.test.ts
-- [ ] Admin tạo plan thành công
-- [ ] Revert khi tenor = 0
-- [ ] Revert khi APR > 10000 (100%)
-- [ ] Update plan status thành công
-- [ ] Revert update plan không tồn tại
-- [ ] Revert khi non-admin gọi createSavingPlan
+- Sau khi NFT được transfer, owner mới phải đợi 24h trước khi withdraw/renew
+- Ngăn chặn front-running và instant withdrawal attacks
+- Áp dụng trên tất cả transfers (trừ mint/burn)
 
-### 10.3 DepositOperations.test.ts
-- [ ] User mở deposit thành công
-- [ ] NFT được mint đúng owner
-- [ ] Token được transfer vào contract
-- [ ] Revert khi plan disabled
-- [ ] Revert khi amount < minimumDeposit
-- [ ] Revert khi amount > maximumDeposit
-- [ ] Revert khi chưa approve token
-- [ ] Revert khi contract paused
+### 10.2 Role-Based Access Control
 
-### 10.4 WithdrawOperations.test.ts
-- [ ] Withdraw đúng hạn: nhận gốc + lãi
-- [ ] Lãi được tính đúng công thức
-- [ ] Vault balance giảm đúng số lãi
-- [ ] NFT bị burn sau withdraw
-- [ ] Deposit được đánh dấu isClosed
-- [ ] Withdraw trước hạn: nhận gốc - penalty
-- [ ] Penalty được chuyển đến penaltyReceiver
-- [ ] Revert khi không phải owner
-- [ ] Revert khi deposit đã closed
-- [ ] Revert khi vault không đủ liquidity
+- `DEFAULT_ADMIN_ROLE`: Full control, grant/revoke roles
+- `ADMIN_ROLE`: Manage plans, vault operations
+- `PAUSER_ROLE`: Emergency pause/unpause
 
-### 10.5 RenewOperations.test.ts
-- [ ] Renew thành công với cùng plan
-- [ ] Renew thành công với plan khác
-- [ ] New principal = old principal + interest
-- [ ] Old NFT bị burn, new NFT được mint
-- [ ] Revert khi deposit chưa mature
-- [ ] Revert khi deposit đã closed
-- [ ] Revert khi new plan disabled
-- [ ] Revert khi không phải owner
+### 10.3 Reentrancy Protection
 
-### 10.6 VaultOperations.test.ts
-- [ ] Admin depositToVault thành công
-- [ ] Vault balance tăng đúng
-- [ ] Admin withdrawFromVault thành công
-- [ ] Revert withdraw khi vault không đủ
-- [ ] Revert khi non-admin gọi vault functions
+- Tất cả state-changing functions có `nonReentrant` modifier
 
-### 10.7 Integration Tests
-- [ ] Full flow: Create plan → Open → Wait → Withdraw mature
-- [ ] Full flow: Create plan → Open → Withdraw early
-- [ ] Full flow: Create plan → Open → Wait → Renew → Withdraw
-- [ ] Multi-user: 2 users cùng gửi tiền
-- [ ] Stress: Nhiều deposits, vault drain scenario
+### 10.4 Pausable
+
+- Emergency stop capability
+- Chặn deposits, withdrawals, renewals khi paused
+- Admin functions vẫn hoạt động
 
 ---
 
-## 11. DEPLOY SCRIPTS
+## 11. DEFINITION OF DONE
 
-### 11.1 `deploy/1-deploy-mock-usdc.ts`
-```typescript
-import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { DeployFunction } from "hardhat-deploy/types";
-
-const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
-    const { deployments, getNamedAccounts } = hre;
-    const { deploy } = deployments;
-    const { deployer } = await getNamedAccounts();
-
-    await deploy("MockUSDC", {
-        contract: "MockUSDC",
-        args: [],
-        from: deployer,
-        log: true,
-        autoMine: true,
-    });
-};
-
-func.tags = ["MockUSDC", "token"];
-export default func;
-```
-
-### 11.2 `deploy/2-deploy-deposit-certificate.ts`
-```typescript
-import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { DeployFunction } from "hardhat-deploy/types";
-
-const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
-    const { deployments, getNamedAccounts } = hre;
-    const { deploy } = deployments;
-    const { deployer } = await getNamedAccounts();
-
-    await deploy("DepositCertificate", {
-        contract: "DepositCertificate",
-        args: [],
-        from: deployer,
-        log: true,
-        autoMine: true,
-    });
-};
-
-func.tags = ["DepositCertificate", "nft"];
-func.dependencies = [];
-export default func;
-```
-
-### 11.3 `deploy/3-deploy-saving-bank.ts`
-```typescript
-import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { DeployFunction } from "hardhat-deploy/types";
-
-const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
-    const { deployments, getNamedAccounts, ethers } = hre;
-    const { deploy, get } = deployments;
-    const { deployer } = await getNamedAccounts();
-
-    const mockUSDC = await get("MockUSDC");
-    const depositCertificate = await get("DepositCertificate");
-
-    const savingBank = await deploy("SavingBank", {
-        contract: "SavingBank",
-        args: [mockUSDC.address, depositCertificate.address],
-        from: deployer,
-        log: true,
-        autoMine: true,
-    });
-
-    // Grant MINTER_ROLE và BURNER_ROLE cho SavingBank
-    const certificateContract = await ethers.getContractAt("DepositCertificate", depositCertificate.address);
-    const MINTER_ROLE = await certificateContract.MINTER_ROLE();
-    const BURNER_ROLE = await certificateContract.BURNER_ROLE();
-    
-    await certificateContract.grantRole(MINTER_ROLE, savingBank.address);
-    await certificateContract.grantRole(BURNER_ROLE, savingBank.address);
-
-    console.log("✅ SavingBank deployed and roles granted");
-};
-
-func.tags = ["SavingBank", "core"];
-func.dependencies = ["MockUSDC", "DepositCertificate"];
-export default func;
-```
+| Tiêu chí              | Yêu cầu                          | Status |
+| :-------------------- | :------------------------------- | :----: |
+| **Compile**           | `npx hardhat compile` thành công |   ✅   |
+| **Contract Size**     | Tất cả contracts < 24KB          |   ✅   |
+| **Unit Tests**        | Coverage ≥ 95%                   |   ✅   |
+| **Integration Tests** | All flows pass                   |   ✅   |
+| **Gas Report**        | No function > 500k gas           |   ✅   |
+| **Deploy**            | Scripts work on localhost        |   ✅   |
+| **NatSpec**           | All public functions documented  |   ✅   |
+| **Clean Code**        | No nested logic > 2 levels       |   ✅   |
+| **Sepolia**           | Deployed & verified              |   ✅   |
+| **Multisig**          | Admin transferred                |   ✅   |
 
 ---
 
 ## 12. TEST HELPERS
 
-### 12.1 `test/helpers/constants.ts`
-```typescript
-export const BASIS_POINTS = 10_000n;
-export const SECONDS_PER_DAY = 86_400n;
-export const SECONDS_PER_YEAR = 365n * SECONDS_PER_DAY;
+### 12.1 Constants (test/helpers/constants.ts)
 
+```typescript
+export const BASIS_POINTS = 10000n;
+export const SECONDS_PER_DAY = 86400n;
+export const SECONDS_PER_YEAR = 31536000n;
 export const USDC_DECIMALS = 6;
 export const ONE_USDC = 10n ** BigInt(USDC_DECIMALS);
-
-export const DEFAULT_PLAN_INPUT = {
-    tenorSeconds: 30n * SECONDS_PER_DAY,        // 30 days
-    annualInterestRateBps: 800n,                 // 8%
-    minimumDeposit: 100n * ONE_USDC,             // 100 USDC
-    maximumDeposit: 0n,                          // unlimited
-    earlyWithdrawalPenaltyBps: 100n,             // 1%
-};
-
-export const ROLES = {
-    DEFAULT_ADMIN_ROLE: "0x0000000000000000000000000000000000000000000000000000000000000000",
-    ADMIN_ROLE: ethers.keccak256(ethers.toUtf8Bytes("ADMIN_ROLE")),
-    PAUSER_ROLE: ethers.keccak256(ethers.toUtf8Bytes("PAUSER_ROLE")),
-    MINTER_ROLE: ethers.keccak256(ethers.toUtf8Bytes("MINTER_ROLE")),
-    BURNER_ROLE: ethers.keccak256(ethers.toUtf8Bytes("BURNER_ROLE")),
-};
 ```
 
-### 12.2 `test/helpers/fixtures.ts`
-```typescript
-import { ethers } from "hardhat";
-import { ONE_USDC, DEFAULT_PLAN_INPUT, ROLES } from "./constants";
+### 12.2 Fixtures (test/helpers/fixtures.ts)
 
-export async function deployFullFixture() {
-    const [deployer, admin, pauser, user1, user2, feeReceiver] = await ethers.getSigners();
+- `deployFullFixture()`: Deploy all contracts with roles configured
 
-    // Deploy MockUSDC
-    const MockUSDC = await ethers.getContractFactory("MockUSDC");
-    const mockUSDC = await MockUSDC.deploy();
+### 12.3 Time Helpers (test/helpers/time.ts)
 
-    // Deploy DepositCertificate
-    const DepositCertificate = await ethers.getContractFactory("DepositCertificate");
-    const depositCertificate = await DepositCertificate.deploy();
-
-    // Deploy SavingBank
-    const SavingBank = await ethers.getContractFactory("SavingBank");
-    const savingBank = await SavingBank.deploy(
-        await mockUSDC.getAddress(),
-        await depositCertificate.getAddress()
-    );
-
-    // Grant roles
-    await depositCertificate.grantRole(ROLES.MINTER_ROLE, await savingBank.getAddress());
-    await depositCertificate.grantRole(ROLES.BURNER_ROLE, await savingBank.getAddress());
-    await savingBank.grantRole(ROLES.ADMIN_ROLE, admin.address);
-    await savingBank.grantRole(ROLES.PAUSER_ROLE, pauser.address);
-
-    // Mint tokens for testing
-    const INITIAL_BALANCE = 1_000_000n * ONE_USDC;
-    await mockUSDC.mint(user1.address, INITIAL_BALANCE);
-    await mockUSDC.mint(user2.address, INITIAL_BALANCE);
-    await mockUSDC.mint(admin.address, INITIAL_BALANCE);
-
-    return {
-        mockUSDC,
-        depositCertificate,
-        savingBank,
-        deployer,
-        admin,
-        pauser,
-        user1,
-        user2,
-        feeReceiver,
-    };
-}
-```
-
-### 12.3 `test/helpers/time.ts`
-```typescript
-import { time } from "@nomicfoundation/hardhat-network-helpers";
-
-export async function advanceTimeByDays(days: number): Promise<void> {
-    await time.increase(days * 24 * 60 * 60);
-}
-
-export async function advanceTimeBySeconds(seconds: number): Promise<void> {
-    await time.increase(seconds);
-}
-
-export async function advanceToTimestamp(timestamp: bigint): Promise<void> {
-    await time.increaseTo(timestamp);
-}
-
-export async function getCurrentTimestamp(): Promise<bigint> {
-    return BigInt(await time.latest());
-}
-```
+- `advanceTimeByDays(days)`: Time travel
+- `advanceTimeBySeconds(seconds)`: Precise time control
 
 ---
 
-## 13. DEFINITION OF DONE
+## 13. CHANGELOG
 
-| Tiêu chí | Yêu cầu |
-|:---------|:--------|
-| **Compile** | `npx hardhat compile` thành công, không warning |
-| **Contract Size** | Tất cả contracts < 24KB |
-| **Unit Tests** | Coverage ≥ 95% cho tất cả functions |
-| **Integration Tests** | Tất cả happy paths pass |
-| **Gas Report** | Không có function nào > 500k gas |
-| **Deploy** | Deploy scripts chạy thành công trên localhost |
-| **NatSpec** | Tất cả public/external functions có đầy đủ NatSpec |
-| **Clean Code** | Không nested logic > 2 levels, không viết tắt |
+### v1.1.0 (31/01/2026)
+
+- ✅ Added new view functions:
+  - `getTotalPlans()`
+  - `getTotalDeposits()`
+  - `getDepositToken()`
+  - `getDepositCertificateAddress()`
+  - `getVaultAddress()`
+  - `getVaultBalance()`
+  - `isDepositMature(depositId)`
+  - `calculateEarlyWithdrawalPenalty(depositId)`
+  - `getPenaltyReceiver(planId)`
+- ✅ Updated ISavingBankView interface
+- ✅ All 155 tests passing
+
+### v1.0.0 (30/01/2026)
+
+- Initial Sepolia deployment
+- Multisig security configured
+- 91 tests passing

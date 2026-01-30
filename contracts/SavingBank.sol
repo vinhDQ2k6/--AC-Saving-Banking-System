@@ -360,12 +360,12 @@ contract SavingBank is AccessControl, Pausable, ReentrancyGuard,
 
     /**
      * @notice Withdraws a deposit (at maturity or early with penalty)
-     * @dev NFT certificate ownership is validated before withdrawal
+     * @dev Only the current NFT certificate owner can withdraw the deposit
      * @param depositId The ID of the deposit to withdraw
      * 
      * Withdrawal Types:
-     * - At Maturity: User receives principal + full interest
-     * - Early Withdrawal: User receives principal - penalty (no interest)
+     * - At Maturity: NFT owner receives principal + full interest
+     * - Early Withdrawal: NFT owner receives principal - penalty (no interest)
      * 
      * Penalty Handling:
      * - If penaltyReceiver is set: penalty sent to receiver
@@ -373,7 +373,7 @@ contract SavingBank is AccessControl, Pausable, ReentrancyGuard,
      * 
      * Requirements:
      * - Contract must not be paused
-     * - Caller must be the deposit owner
+     * - Caller must be the current NFT certificate owner
      * - Deposit must be in Active status
      * - Vault must have sufficient liquidity
      * 
@@ -384,7 +384,19 @@ contract SavingBank is AccessControl, Pausable, ReentrancyGuard,
      */
     function withdrawDeposit(uint256 depositId) external nonReentrant whenNotPaused {
         ISavingBankStructs.Deposit storage deposit = deposits[depositId];
-        if (deposit.user != msg.sender) revert UnauthorizedWithdrawal(msg.sender, depositId);
+        
+        // Check if deposit exists
+        if (deposit.id == 0) revert DepositNotFound(depositId);
+        
+        // Check if caller is the current NFT certificate owner
+        address certificateOwner = depositCertificate.ownerOf(depositId);
+        if (certificateOwner != msg.sender) revert UnauthorizedWithdrawal(msg.sender, depositId);
+        
+        // Check if NFT is in transfer cooldown period (security measure)
+        if (depositCertificate.isInCooldown(depositId)) {
+            revert CertificateInCooldown(depositId, depositCertificate.getRemainingCooldown(depositId));
+        }
+        
         if (deposit.status != ISavingBankStructs.DepositStatus.Active) revert DepositNotActive(depositId);
 
         ISavingBankStructs.SavingPlan memory plan = savingPlans[deposit.savingPlanId];
@@ -472,7 +484,16 @@ contract SavingBank is AccessControl, Pausable, ReentrancyGuard,
         ISavingBankStructs.Deposit storage oldDeposit = deposits[depositId];
         
         if (oldDeposit.id == 0) revert DepositNotFound(depositId);
-        if (oldDeposit.user != msg.sender) revert UnauthorizedWithdrawal(msg.sender, depositId);
+        
+        // Check if caller is the current NFT certificate owner
+        address certificateOwner = depositCertificate.ownerOf(depositId);
+        if (certificateOwner != msg.sender) revert UnauthorizedWithdrawal(msg.sender, depositId);
+        
+        // Check if NFT is in transfer cooldown period (security measure)
+        if (depositCertificate.isInCooldown(depositId)) {
+            revert CertificateInCooldown(depositId, depositCertificate.getRemainingCooldown(depositId));
+        }
+        
         if (oldDeposit.status != ISavingBankStructs.DepositStatus.Active) revert DepositNotActive(depositId);
         
         if (block.timestamp < oldDeposit.maturityDate) {
@@ -504,7 +525,7 @@ contract SavingBank is AccessControl, Pausable, ReentrancyGuard,
 
         deposits[newDepositId] = ISavingBankStructs.Deposit({
             id: newDepositId,
-            user: msg.sender,
+            user: certificateOwner, // Use current certificate owner instead of msg.sender
             savingPlanId: newPlanId,
             amount: newPrincipal,
             termInDays: newTermInDays,
@@ -514,14 +535,14 @@ contract SavingBank is AccessControl, Pausable, ReentrancyGuard,
             status: ISavingBankStructs.DepositStatus.Active
         });
 
-        userDepositIds[msg.sender].push(newDepositId);
+        userDepositIds[certificateOwner].push(newDepositId);
         
-        uint256 certificateId = depositCertificate.mintCertificate(msg.sender, newDepositId);
+        uint256 certificateId = depositCertificate.mintCertificate(certificateOwner, newDepositId);
 
-        emit DepositRenewed(depositId, newDepositId, msg.sender, newPrincipal, newPlanId);
+        emit DepositRenewed(depositId, newDepositId, certificateOwner, newPrincipal, newPlanId);
         emit DepositCreated(
             newDepositId,
-            msg.sender,
+            certificateOwner,
             newPlanId,
             newPrincipal,
             newTermInDays,
@@ -542,6 +563,93 @@ contract SavingBank is AccessControl, Pausable, ReentrancyGuard,
     function getSavingPlan(uint256 planId) external view returns (ISavingBankStructs.SavingPlan memory) {
         if (savingPlans[planId].id == 0) revert SavingPlanNotFound(planId);
         return savingPlans[planId];
+    }
+
+    /**
+     * @notice Returns the total number of saving plans created
+     * @return The count of all saving plans (including inactive ones)
+     */
+    function getTotalPlans() external view returns (uint256) {
+        return _nextPlanId - 1;
+    }
+
+    /**
+     * @notice Returns the total number of deposits ever created
+     * @return The count of all deposits (including closed/renewed ones)
+     */
+    function getTotalDeposits() external view returns (uint256) {
+        return _nextDepositId - 1;
+    }
+
+    /**
+     * @notice Returns the address of the deposit token (e.g., USDC)
+     * @return The ERC20 token contract address
+     */
+    function getDepositToken() external view returns (address) {
+        return address(depositToken);
+    }
+
+    /**
+     * @notice Returns the address of the deposit certificate NFT contract
+     * @return The DepositCertificate contract address
+     */
+    function getDepositCertificateAddress() external view returns (address) {
+        return address(depositCertificate);
+    }
+
+    /**
+     * @notice Returns the address of the vault contract
+     * @return The Vault contract address
+     */
+    function getVaultAddress() external view returns (address) {
+        return address(vault);
+    }
+
+    /**
+     * @notice Returns the current balance of the vault
+     * @return The vault's token balance
+     */
+    function getVaultBalance() external view returns (uint256) {
+        return vault.getBalance();
+    }
+
+    /**
+     * @notice Checks if a deposit has reached its maturity date
+     * @param depositId The ID of the deposit to check
+     * @return True if the deposit is mature (current time >= maturity date)
+     */
+    function isDepositMature(uint256 depositId) external view returns (bool) {
+        ISavingBankStructs.Deposit memory deposit = deposits[depositId];
+        if (deposit.id == 0) revert DepositNotFound(depositId);
+        return block.timestamp >= deposit.maturityDate;
+    }
+
+    /**
+     * @notice Calculates the penalty amount for early withdrawal of a specific deposit
+     * @param depositId The ID of the deposit
+     * @return penaltyAmount The penalty amount if withdrawn early (0 if already mature)
+     */
+    function calculateEarlyWithdrawalPenalty(uint256 depositId) external view returns (uint256 penaltyAmount) {
+        ISavingBankStructs.Deposit memory deposit = deposits[depositId];
+        if (deposit.id == 0) revert DepositNotFound(depositId);
+        
+        // If already mature, no penalty
+        if (block.timestamp >= deposit.maturityDate) {
+            return 0;
+        }
+        
+        ISavingBankStructs.SavingPlan memory plan = savingPlans[deposit.savingPlanId];
+        penaltyAmount = deposit.amount.calculatePenalty(plan.penaltyRateInBasisPoints);
+    }
+
+    /**
+     * @notice Returns the penalty receiver address for a specific plan
+     * @param planId The ID of the saving plan
+     * @return The address that receives early withdrawal penalties (zero address if not set)
+     */
+    function getPenaltyReceiver(uint256 planId) external view returns (address) {
+        if (savingPlans[planId].id == 0) revert SavingPlanNotFound(planId);
+        return planPenaltyReceivers[planId];
     }
 
     /**

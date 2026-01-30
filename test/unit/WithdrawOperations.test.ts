@@ -258,7 +258,7 @@ describe("Withdrawal Operations", function () {
   });
 
   describe("Withdrawal Restrictions and Security", function () {
-    it("should reject withdrawal by non-owner", async function () {
+    it("should reject withdrawal by non-certificate-owner", async function () {
       const depositAmount = 3000_000000n;
       
       // User1 creates deposit
@@ -269,7 +269,7 @@ describe("Withdrawal Operations", function () {
       const event = receipt.logs.find((log: any) => log.fragment && log.fragment.name === 'DepositCreated');
       const depositId = event.args[0];
       
-      // User2 tries to withdraw user1's deposit
+      // User2 (who doesn't own the certificate) tries to withdraw
       try {
         await savingBank.connect(user2).withdrawDeposit(depositId);
         expect.fail("Expected function to revert");
@@ -335,20 +335,19 @@ describe("Withdrawal Operations", function () {
       // Transfer certificate to user2
       await depositCertificate.connect(user1).transferFrom(user1.address, user2.address, certificateId);
       
-      // Original deposit owner (user1) should still be able to withdraw (deposit.user unchanged)
-      // Certificate ownership doesn't affect withdrawal permissions in current implementation
+      // Now user2 (certificate owner) can withdraw since withdrawal is based on certificate ownership
       const deposit = await savingBank.getDeposit(depositId);
       await time.increaseTo(deposit.maturityDate);
       
-      const initialBalance = await mockUSDC.balanceOf(user1.address);
-      await savingBank.connect(user1).withdrawDeposit(depositId);
-      const finalBalance = await mockUSDC.balanceOf(user1.address);
+      const initialBalance = await mockUSDC.balanceOf(user2.address);
+      await savingBank.connect(user2).withdrawDeposit(depositId);
+      const finalBalance = await mockUSDC.balanceOf(user2.address);
       
       expect(Number(finalBalance)).to.be.gt(Number(initialBalance));
       
-      // Verify user2 (certificate owner) cannot withdraw since they're not the deposit owner
+      // Verify user1 (original depositor) cannot withdraw since they no longer own the certificate
       try {
-        await savingBank.connect(user2).withdrawDeposit(depositId);
+        await savingBank.connect(user1).withdrawDeposit(depositId);
         expect.fail("Expected function to revert");
       } catch (error: any) {
         expect(error.message).to.include('revert');

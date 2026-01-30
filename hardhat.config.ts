@@ -22,10 +22,12 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
   }
 });
 
-const {
-  TESTNET_PRIVATE_KEY: testnetPrivateKey,
-} = process.env;
+const { TESTNET_PRIVATE_KEY: testnetPrivateKey } = process.env;
 const reportGas = process.env.REPORT_GAS;
+
+// Validate private key - must be 64 hex characters (32 bytes)
+const isValidPrivateKey =
+  testnetPrivateKey && testnetPrivateKey.length === 64 && /^[0-9a-fA-F]+$/.test(testnetPrivateKey);
 
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
@@ -35,11 +37,17 @@ const reportGas = process.env.REPORT_GAS;
  */
 module.exports = {
   networks: {
-    sepolia: {
-      url: "https://eth-sepolia.public.blastapi.io",
-      chainId: 11155111,
-      accounts: testnetPrivateKey ? [testnetPrivateKey] : [],
+    localhost: {
+      url: "http://127.0.0.1:8545",
+      chainId: 31337,
       timeout: 40000,
+    },
+    sepolia: {
+      url: "https://ethereum-sepolia-rpc.publicnode.com", // Free public RPC
+      chainId: 11155111,
+      accounts: isValidPrivateKey ? [testnetPrivateKey] : [],
+      timeout: 40000,
+      gasPrice: "auto",
     },
   },
   solidity: {
@@ -51,9 +59,9 @@ module.exports = {
             enabled: true,
             runs: 1000,
           },
-          viaIR: true
+          viaIR: true,
         },
-      }
+      },
     ],
   },
   abiExporter: {
@@ -73,9 +81,7 @@ module.exports = {
     runOnCompile: true,
   },
   etherscan: {
-    apiKey: {
-      sepolia: process.env.ETHERSCAN_API_KEY || "",
-    }
+    apiKey: process.env.ETHERSCAN_API_KEY || "",
   },
   sourcify: {
     // Disabled by default

@@ -25,6 +25,9 @@ interface ISavingBankErrors {
     error UnauthorizedWithdrawal(address caller, uint256 depositId);
     error InvalidAddress();
     error InsufficientVaultLiquidity(uint256 requested, uint256 available);
+    
+    // NFT transfer cooldown error
+    error CertificateInCooldown(uint256 depositId, uint256 remainingSeconds);
 
     // Legacy errors for backward compatibility
     error PlanNotFound(uint256 planId);
