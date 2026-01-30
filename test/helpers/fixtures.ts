@@ -36,6 +36,7 @@ export async function deployFullFixture() {
 
   // Grant roles
   await vault.grantRole(LIQUIDITY_MANAGER_ROLE, savingBank.target);
+  await vault.grantRole(LIQUIDITY_MANAGER_ROLE, admin.address); // Admin can add liquidity
   await vault.grantRole(WITHDRAW_ROLE, savingBank.target);
   await depositCertificate.grantRole(MINTER_ROLE, savingBank.target);
   await savingBank.grantRole(ADMIN_ROLE, admin.address);

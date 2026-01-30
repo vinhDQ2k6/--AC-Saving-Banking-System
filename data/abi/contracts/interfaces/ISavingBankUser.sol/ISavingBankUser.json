@@ -3,16 +3,21 @@
         "inputs": [
             {
                 "internalType": "uint256",
-                "name": "planId",
+                "name": "savingPlanId",
                 "type": "uint256"
             },
             {
                 "internalType": "uint256",
                 "name": "amount",
                 "type": "uint256"
+            },
+            {
+                "internalType": "uint32",
+                "name": "termInDays",
+                "type": "uint32"
             }
         ],
-        "name": "openDeposit",
+        "name": "createDeposit",
         "outputs": [
             {
                 "internalType": "uint256",
@@ -34,6 +39,11 @@
                 "internalType": "uint256",
                 "name": "newPlanId",
                 "type": "uint256"
+            },
+            {
+                "internalType": "uint32",
+                "name": "newTermInDays",
+                "type": "uint32"
             }
         ],
         "name": "renewDeposit",

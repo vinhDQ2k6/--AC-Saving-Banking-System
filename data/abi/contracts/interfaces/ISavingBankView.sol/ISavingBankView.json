@@ -3,27 +3,18 @@
         "inputs": [
             {
                 "internalType": "uint256",
-                "name": "depositId",
+                "name": "amount",
                 "type": "uint256"
-            }
-        ],
-        "name": "calculateEarlyWithdrawalPenalty",
-        "outputs": [
+            },
             {
                 "internalType": "uint256",
-                "name": "",
+                "name": "planId",
                 "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
+            },
             {
-                "internalType": "uint256",
-                "name": "depositId",
-                "type": "uint256"
+                "internalType": "uint32",
+                "name": "termInDays",
+                "type": "uint32"
             }
         ],
         "name": "calculateExpectedInterest",
@@ -39,12 +30,12 @@
     },
     {
         "inputs": [],
-        "name": "getDepositCertificate",
+        "name": "getActiveDepositCount",
         "outputs": [
             {
-                "internalType": "address",
+                "internalType": "uint256",
                 "name": "",
-                "type": "address"
+                "type": "uint256"
             }
         ],
         "stateMutability": "view",
@@ -58,62 +49,59 @@
                 "type": "uint256"
             }
         ],
-        "name": "getDepositRecord",
+        "name": "getDeposit",
         "outputs": [
             {
                 "components": [
                     {
                         "internalType": "uint256",
-                        "name": "depositId",
+                        "name": "id",
                         "type": "uint256"
                     },
                     {
                         "internalType": "address",
-                        "name": "depositor",
+                        "name": "user",
                         "type": "address"
                     },
                     {
                         "internalType": "uint256",
-                        "name": "planId",
+                        "name": "savingPlanId",
                         "type": "uint256"
                     },
                     {
                         "internalType": "uint256",
-                        "name": "principalAmount",
+                        "name": "amount",
                         "type": "uint256"
                     },
                     {
-                        "internalType": "uint64",
-                        "name": "depositTimestamp",
-                        "type": "uint64"
+                        "internalType": "uint32",
+                        "name": "termInDays",
+                        "type": "uint32"
                     },
                     {
-                        "internalType": "uint64",
-                        "name": "maturityTimestamp",
-                        "type": "uint64"
+                        "internalType": "uint256",
+                        "name": "expectedInterest",
+                        "type": "uint256"
                     },
                     {
-                        "internalType": "bool",
-                        "name": "isClosed",
-                        "type": "bool"
+                        "internalType": "uint256",
+                        "name": "depositDate",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "maturityDate",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "enum ISavingBankStructs.DepositStatus",
+                        "name": "status",
+                        "type": "uint8"
                     }
                 ],
-                "internalType": "struct ISavingBankStructs.DepositRecord",
+                "internalType": "struct ISavingBankStructs.Deposit",
                 "name": "",
                 "type": "tuple"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "getDepositToken",
-        "outputs": [
-            {
-                "internalType": "address",
-                "name": "",
-                "type": "address"
             }
         ],
         "stateMutability": "view",
@@ -186,58 +174,19 @@
         "type": "function"
     },
     {
-        "inputs": [],
-        "name": "getTotalDeposits",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "getTotalPlans",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "getVaultBalance",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
         "inputs": [
             {
-                "internalType": "uint256",
-                "name": "depositId",
-                "type": "uint256"
+                "internalType": "address",
+                "name": "user",
+                "type": "address"
             }
         ],
-        "name": "isDepositMature",
+        "name": "getUserDepositIds",
         "outputs": [
             {
-                "internalType": "bool",
+                "internalType": "uint256[]",
                 "name": "",
-                "type": "bool"
+                "type": "uint256[]"
             }
         ],
         "stateMutability": "view",

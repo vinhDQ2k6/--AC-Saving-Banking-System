@@ -170,25 +170,23 @@ describe("Deposit Operations", function () {
       
       await mockUSDC.connect(user1).approve(savingBank.target, depositAmount);
       
-      const beforeDeposit = Math.floor(Date.now() / 1000);
       const tx = await savingBank.connect(user1).createDeposit(1, depositAmount, termDays);
       const receipt = await tx.wait();
-      const afterDeposit = Math.floor(Date.now() / 1000);
 
       const event = receipt.logs.find((log: any) => log.fragment && log.fragment.name === 'DepositCreated');
       const depositId = event.args[0];
+      // Event args: depositId, user, savingPlanId, amount, termInDays, maturityDate, certificateId
       const maturityDate = event.args[5];
 
       const deposit = await savingBank.getDeposit(depositId);
       
-      // Verify maturity date is approximately correct (with generous timing tolerance)
-      const expectedMaturityMin = beforeDeposit + (termDays * 24 * 60 * 60) - 30; // 30 second buffer
-      const expectedMaturityMax = afterDeposit + (termDays * 24 * 60 * 60) + 30; // 30 second buffer
-      
+      // Verify maturity date = depositDate + (termDays * 1 day in seconds)
+      const depositDate = Number(deposit.depositDate);
+      const expectedMaturity = depositDate + (termDays * 24 * 60 * 60);
       const actualMaturity = Number(maturityDate);
-      expect(actualMaturity).to.be.gte(expectedMaturityMin);
-      expect(actualMaturity).to.be.lte(expectedMaturityMax);
       
+      // Should be exact match
+      expect(actualMaturity).to.equal(expectedMaturity);
       expect(deposit.maturityDate).to.equal(maturityDate);
     });
   });
@@ -325,7 +323,7 @@ expect(deposit1.termInDays).to.equal(60n);
         const deposit = await savingBank.getDeposit(depositId);
         
         // Just verify that interest is calculated (non-zero) and reasonable
-        expect(deposit.expectedInterest).to.be.gt(0n);
+        expect(Number(deposit.expectedInterest)).to.be.gt(0);
         
         // For manual verification, log the actual calculated values
         console.log(`Amount: ${testCase.amount}, Term: ${testCase.term} days, Actual Interest: ${deposit.expectedInterest}`);

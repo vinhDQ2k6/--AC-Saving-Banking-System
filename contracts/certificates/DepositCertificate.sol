@@ -8,21 +8,35 @@ import "../interfaces/IDepositCertificate.sol";
 
 /**
  * @title DepositCertificate
- * @dev NFT contract representing deposit certificates for saving plans
- * @notice Each deposit is represented by a unique NFT certificate
+ * @author Saving Banking Team
+ * @notice ERC721 NFT contract representing deposit certificates for saving plans
+ * @dev Each deposit is represented by a unique, transferable NFT certificate
+ * 
+ * Features:
+ * - Mints NFT when user creates a deposit (tokenId = depositId)
+ * - Burns NFT when deposit is closed (optional, currently not used)
+ * - Supports enumeration for listing user's certificates
+ * - Transferable: allows secondary market for deposit positions
+ * 
+ * Security:
+ * - Only MINTER_ROLE (typically SavingBank) can mint/burn certificates
+ * - DEFAULT_ADMIN_ROLE can manage roles and set base URI
  */
 contract DepositCertificate is ERC721, ERC721Enumerable, AccessControl, IDepositCertificate {
+    /// @notice Role identifier for minting and burning certificates
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
-    // Mapping from deposit ID to token ID (they are the same in this implementation)
+    /// @dev Mapping to track which deposit IDs have certificates
     mapping(uint256 => bool) private _depositExists;
     
+    /// @dev Base URI for token metadata
     string private _baseTokenURI;
 
     /**
-     * @dev Constructor sets the NFT name, symbol and grants roles
-     * @param name The name of the NFT collection
-     * @param symbol The symbol of the NFT collection
+     * @notice Initializes the NFT collection with name and symbol
+     * @dev Grants DEFAULT_ADMIN_ROLE and MINTER_ROLE to deployer
+     * @param name The name of the NFT collection (e.g., "SavingBank Deposit Certificate")
+     * @param symbol The symbol of the NFT collection (e.g., "SBDC")
      */
     constructor(string memory name, string memory symbol) ERC721(name, symbol) {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
@@ -30,11 +44,17 @@ contract DepositCertificate is ERC721, ERC721Enumerable, AccessControl, IDeposit
     }
 
     /**
-     * @dev Mint a certificate NFT to represent a deposit
+     * @notice Mints a certificate NFT to represent a deposit
+     * @dev Only callable by addresses with MINTER_ROLE (typically SavingBank)
      * @param to The address that will own the certificate
-     * @param depositId The unique deposit ID
-     * @notice Only addresses with MINTER_ROLE can call this function
-     * @notice The deposit ID is used as the NFT token ID
+     * @param depositId The unique deposit ID (also becomes the tokenId)
+     * @return The tokenId of the minted certificate (same as depositId)
+     * 
+     * Requirements:
+     * - Certificate for this depositId must not already exist
+     * - to must not be zero address
+     * 
+     * Note: The depositId is used as the tokenId for easy mapping
      */
     function mintCertificate(address to, uint256 depositId) external onlyRole(MINTER_ROLE) returns (uint256) {
         require(!_depositExists[depositId], "Certificate already exists for this deposit");
@@ -46,9 +66,14 @@ contract DepositCertificate is ERC721, ERC721Enumerable, AccessControl, IDeposit
     }
 
     /**
-     * @dev Burn a certificate NFT when deposit is closed
+     * @notice Burns a certificate NFT when deposit is closed
+     * @dev Only callable by addresses with MINTER_ROLE
      * @param depositId The deposit ID whose certificate will be burned
-     * @notice Only addresses with MINTER_ROLE can call this function
+     * 
+     * Requirements:
+     * - Certificate for this depositId must exist
+     * 
+     * Note: Currently not used in SavingBank (certificates remain after withdrawal)
      */
     function burnCertificate(uint256 depositId) external onlyRole(MINTER_ROLE) {
         require(_depositExists[depositId], "Certificate does not exist");
@@ -58,7 +83,7 @@ contract DepositCertificate is ERC721, ERC721Enumerable, AccessControl, IDeposit
     }
 
     /**
-     * @dev Check if a certificate exists for a given deposit ID
+     * @notice Checks if a certificate exists for a given deposit ID
      * @param depositId The deposit ID to check
      * @return True if certificate exists, false otherwise
      */
@@ -67,23 +92,24 @@ contract DepositCertificate is ERC721, ERC721Enumerable, AccessControl, IDeposit
     }
 
     /**
-     * @dev Set the base URI for token metadata
-     * @param baseTokenURI The base URI to set
-     * @notice Only addresses with DEFAULT_ADMIN_ROLE can call this function
+     * @notice Sets the base URI for token metadata
+     * @dev Only callable by DEFAULT_ADMIN_ROLE
+     * @param baseTokenURI The base URI to set (e.g., "https://api.savingbank.com/certificates/")
      */
     function setBaseURI(string memory baseTokenURI) external onlyRole(DEFAULT_ADMIN_ROLE) {
         _baseTokenURI = baseTokenURI;
     }
 
     /**
-     * @dev Returns the base URI for tokens
+     * @notice Returns the base URI for token metadata
+     * @return The configured base URI string
      */
     function _baseURI() internal view override returns (string memory) {
         return _baseTokenURI;
     }
 
     /**
-     * @dev Override to handle enumerable extension
+     * @dev Override required for ERC721Enumerable compatibility
      */
     function _update(address to, uint256 tokenId, address auth)
         internal
@@ -94,7 +120,7 @@ contract DepositCertificate is ERC721, ERC721Enumerable, AccessControl, IDeposit
     }
 
     /**
-     * @dev Override to handle enumerable extension
+     * @dev Override required for ERC721Enumerable compatibility
      */
     function _increaseBalance(address account, uint128 value)
         internal
@@ -104,7 +130,9 @@ contract DepositCertificate is ERC721, ERC721Enumerable, AccessControl, IDeposit
     }
 
     /**
-     * @dev Override required by Solidity for interface support
+     * @notice Checks if the contract supports a given interface
+     * @param interfaceId The interface identifier to check
+     * @return True if the interface is supported
      */
     function supportsInterface(bytes4 interfaceId)
         public
